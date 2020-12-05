@@ -27,15 +27,17 @@ class ProductItem extends StatelessWidget {
         footer: GridTileBar(
           backgroundColor: Colors.black87,
           leading: Consumer<Product>(
-            builder: (ctx, product, child ) => IconButton(
-            icon: Icon(
-              product.isFavorite ? Icons.favorite : Icons.favorite_border,
-            ),
-            color: Theme.of(context).accentColor,
-            onPressed: () {
-              product.toggleFavoriteStatus();
-            },
-          )),
+              builder: (ctx, product, child) => IconButton(
+                    icon: Icon(
+                      product.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                    ),
+                    color: Theme.of(context).accentColor,
+                    onPressed: () {
+                      product.toggleFavoriteStatus();
+                    },
+                  )),
           title: Text(
             product.title,
             textAlign: TextAlign.center,
@@ -45,10 +47,33 @@ class ProductItem extends StatelessWidget {
               Icons.shopping_cart,
             ),
             onPressed: () {
-              cart.addItem(productId: product.id, price: product.price, title: product.title);
+              cart.addItem(
+                  productId: product.id,
+                  price: product.price,
+                  title: product.title);
+              Scaffold.of(context).hideCurrentSnackBar();
+              addSnackBarWithTheMessageAndUnDoOption(context, () {
+                cart.decreaseQuantityOfTheItem(id: product.id);
+              });
             },
             color: Theme.of(context).accentColor,
           ),
+        ),
+      ),
+    );
+  }
+
+  ScaffoldFeatureController addSnackBarWithTheMessageAndUnDoOption(
+      BuildContext context, Function function) {
+    return Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Added Item to Cart",
+        ),
+        duration: Duration(seconds: 2),
+        action: SnackBarAction(
+          label: "UNDO",
+          onPressed: function,
         ),
       ),
     );

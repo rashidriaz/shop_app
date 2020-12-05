@@ -13,18 +13,22 @@ class OrderScreen extends StatelessWidget {
     bool neverPlacedOrder = orders.orders.length < 1;
     return Scaffold(
       appBar: AppBar(
-        title: Align(
-          alignment: Alignment.center,
-          child:Text(
+        title: Text(
           "My Orders",
-        ),),
+        ),
       ),
       drawer: AppDrawer(),
       body: (neverPlacedOrder)
-          ? Text("Nothing to Show here!")
+          ? Align(
+              alignment: Alignment.center,
+              child: Text(
+                "Nothing to Show here!",
+              ),
+            )
           : ListView.builder(
               itemCount: orders.orders.length,
-              itemBuilder: (context, index) => OrderScreenItem(orders.orders[index]),
+              itemBuilder: (context, index) =>
+                  OrderScreenItem(orders.orders[index]),
             ),
     );
   }
