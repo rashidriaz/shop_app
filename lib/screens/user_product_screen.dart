@@ -25,7 +25,7 @@ class UserProductScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: Padding(
+      body: RefreshIndicator(onRefresh: () => _refreshScreen(context),child: Padding(
         padding: EdgeInsets.all(8),
         child: ListView.builder(
           itemCount: products.items.length,
@@ -37,7 +37,10 @@ class UserProductScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      ),),
     );
+  }
+  Future<void> _refreshScreen(BuildContext context) async {
+    await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
   }
 }

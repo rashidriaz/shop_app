@@ -30,27 +30,33 @@ class UserProductItem extends StatelessWidget {
     );
   }
 
-  IconButton deleteIcon(BuildContext context, String id){
+  IconButton deleteIcon(BuildContext context, String id) {
+    final scaffold = Scaffold.of(context);
     return IconButton(
       icon: Icon(Icons.delete),
-      onPressed: () =>
-          Provider.of<Products>(context).deleteProduct(id),
-      color: Theme
-          .of(context)
-          .errorColor,
+      onPressed: () async {
+        try {
+          await Provider.of<Products>(context, listen: false).deleteProduct(id);
+        } catch (error) {
+          scaffold.showSnackBar(
+            SnackBar(
+              content: Text("Deletion Failed", textAlign: TextAlign.center,),
+            ),
+          );
+        }
+      },
+      color: Theme.of(context).errorColor,
     );
   }
 
-  IconButton editButton(BuildContext context, String id){
+  IconButton editButton(BuildContext context, String id) {
     return IconButton(
-        icon: Icon(Icons.edit),
-    onPressed: () {
-    Navigator.of(context)
-        .pushNamed(EditProductScreen.routeName, arguments: id);
-    },
-    color: Theme
-        .of(context)
-        .primaryColor,
+      icon: Icon(Icons.edit),
+      onPressed: () {
+        Navigator.of(context)
+            .pushNamed(EditProductScreen.routeName, arguments: id);
+      },
+      color: Theme.of(context).primaryColor,
     );
   }
 }

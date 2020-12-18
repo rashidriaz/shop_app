@@ -48,26 +48,61 @@ class CartScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         fontSize: 22),
                   ),
-                  Consumer<Orders>(
-                    builder: (_, orders, child) => FlatButton(
-                      color: Theme.of(context).primaryColor,
-                      onPressed: () {
-                        orders.addOrder(cart.selectedItems, cart.totalAmount);
-                        cart.removeSelectedItems();
-                      },
-                      child: child,
-                    ),
-                    child: Text(
-                      "ORDER NOW",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  OrderButton(cart),
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  final Cart cart;
+
+  const OrderButton(this.cart);
+
+  @override
+  _OrderButtonState createState() {
+    return _OrderButtonState(cart);
+  }
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  final Cart cart;
+
+  _OrderButtonState(this.cart);
+
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<Orders>(
+      builder: (_, orders, child) => FlatButton(
+        color: Theme.of(context).primaryColor,
+        onPressed: (cart.totalAmount <= 0 || _isLoading)
+            ? null
+            : () async {
+                setState(() {
+                  _isLoading = true;
+                });
+                await orders.addOrder(cart.selectedItems, cart.totalAmount);
+                setState(() {
+                  _isLoading = false;
+                });
+                cart.removeSelectedItems();
+              },
+        child: child,
+      ),
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : Text(
+              "ORDER NOW",
+              style: TextStyle(
+                  color: cart.totalAmount <= 0 ? Colors.black54 : Colors.white),
+            ),
     );
   }
 }
