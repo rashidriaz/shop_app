@@ -12,7 +12,6 @@ class UserProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<Products>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Product"),
@@ -25,22 +24,37 @@ class UserProductScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(onRefresh: () => _refreshScreen(context),child: Padding(
-        padding: EdgeInsets.all(8),
-        child: ListView.builder(
-          itemCount: products.items.length,
-          itemBuilder: (_, index) => Column(
-            children: [
-              UserProductItem(
-                  products.items[index].title, products.items[index].imageUrl, products.items[index].id),
-              Divider(),
-            ],
-          ),
-        ),
-      ),),
+      body: FutureBuilder(
+        future: _refreshScreen(context),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () => _refreshScreen(context),
+                    child: Consumer<Products>(
+                      builder: (context, products, _) => Padding(
+                        padding: EdgeInsets.all(8),
+                        child: ListView.builder(
+                          itemCount: products.items.length,
+                          itemBuilder: (_, index) => Column(
+                            children: [
+                              UserProductItem(
+                                  products.items[index].title,
+                                  products.items[index].imageUrl,
+                                  products.items[index].id),
+                              Divider(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+      ),
     );
   }
+
   Future<void> _refreshScreen(BuildContext context) async {
-    await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    await Provider.of<Products>(context, listen: false)
+        .fetchAndSetProducts(true);
   }
 }
