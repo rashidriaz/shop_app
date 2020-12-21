@@ -23,7 +23,12 @@ class _ProductsOverviewScreenState extends State<ProductsOverViewScreen> {
   bool _isLoading = false;
 
   Future<void> _refreshScreen(BuildContext context) async {
-    await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    try {
+      await Provider.of<Products>(context, listen: false).fetchAndSetProducts(
+          filterByUser: false);
+    }catch(error){
+      print("error in overview _refresh method");
+    }
   }
 
   @override
@@ -32,10 +37,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverViewScreen> {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<Products>(context)
-          .fetchAndSetProducts()
-          .then((_) => _isLoading = false);
-    }
+      try {
+        Provider.of<Products>(context)
+            .fetchAndSetProducts(filterByUser: false)
+            .then((_) => _isLoading = false);
+      }catch(error){
+        print("error in overview did change dependency");
+      }
+      }
     _isInitState = false;
     super.didChangeDependencies();
   }

@@ -8,6 +8,7 @@ class OrderScreenItem extends StatefulWidget {
 
   const OrderScreenItem(this.item);
 
+
   @override
   State createState() {
     return _OrderScreenItemState(item);
@@ -22,7 +23,9 @@ class _OrderScreenItemState extends State<OrderScreenItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      height: _expanded? min(widget.item.products.length * 20.0 + 110, 200): 95,
       margin: EdgeInsets.all(10),
       child: Column(
         children: [
@@ -40,10 +43,11 @@ class _OrderScreenItemState extends State<OrderScreenItem> {
               },
             ),
           ),
-          if (_expanded)
-            Container(
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+
               padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-              height: min(widget.item.products.length * 20.0 + 10, 100),
+              height: _expanded? min(widget.item.products.length * 20.0 + 10, 100) : 0,
               child: ListView.builder(
                   itemCount: item.products.length,
                   itemBuilder: (context, index) => Row(

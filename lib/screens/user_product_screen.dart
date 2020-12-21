@@ -54,7 +54,11 @@ class UserProductScreen extends StatelessWidget {
   }
 
   Future<void> _refreshScreen(BuildContext context) async {
-    await Provider.of<Products>(context, listen: false)
-        .fetchAndSetProducts(true);
+    try {
+      await Provider.of<Products>(context, listen: false)
+          .fetchAndSetProducts(filterByUser: true);
+    }catch(error){
+      print("Error in user Screen");
+    }
   }
 }
