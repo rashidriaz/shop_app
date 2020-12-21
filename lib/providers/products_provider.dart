@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shop_app/modals/http_excetion.dart';
+import 'package:shop_app/modals/http_exception.dart';
 import 'package:shop_app/providers/product.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,6 +8,7 @@ class Products with ChangeNotifier {
   List<Product> _items = [];
   String authToken;
   String userId;
+
   Products(this.authToken, this.userId, this._items);
 
   List<Product> get favoriteItems {
@@ -18,9 +19,10 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+  Future<void> fetchAndSetProducts({bool filterByUser = false}) async {
     try {
-      final filterString = filterByUser? 'orderBy="creatorId"&equalTo="$userId"' : '';
+      final filterString =
+          filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
       final _productsUrl =
           'https://flutter-practice-shopapp-4b993-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString';
       final favoriteStatusUrl =
@@ -28,24 +30,29 @@ class Products with ChangeNotifier {
       final response = await http.get(_productsUrl);
       final fetchedData = json.decode(response.body) as Map<String, dynamic>;
       List<Product> loadedItems = [];
-      if(fetchedData == null)return;
+      if (fetchedData == null) {
+        return;
+      }
       final favoriteResponse = await http.get(favoriteStatusUrl);
-      final favoriteData = json.decode(favoriteResponse.body);
+      final favoriteItemsData = json.decode(favoriteResponse.body);
+      final isFavorite = favoriteItemsData == null ? false : null;
       fetchedData.forEach((id, data) {
+        
         loadedItems.add(
           Product(
               id: id,
               title: data['title'],
               description: data['description'],
               price: data['price'],
-              isFavorite: favoriteData == null? false:  favoriteData[id] ?? false,
+              isFavorite: isFavorite == null ? false : (favoriteItemsData[id]?.isFavorite ?? false),
               imageUrl: data['imageUrl']),
         );
       });
+
       _items = loadedItems;
       notifyListeners();
     } catch (error) {
-      throw error;
+      throw (error);
     }
   }
 
