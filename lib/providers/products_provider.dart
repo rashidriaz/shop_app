@@ -35,16 +35,16 @@ class Products with ChangeNotifier {
       }
       final favoriteResponse = await http.get(favoriteStatusUrl);
       final favoriteItemsData = json.decode(favoriteResponse.body);
+      final isFavorite = favoriteItemsData == null ? false : null;
       fetchedData.forEach((id, data) {
+        
         loadedItems.add(
           Product(
               id: id,
               title: data['title'],
               description: data['description'],
               price: data['price'],
-              isFavorite: (favoriteItemsData == null)
-                  ? false
-                  : favoriteItemsData[id][0]['isFavorite'] ?? false,
+              isFavorite: isFavorite == null ? false : (favoriteItemsData[id]?.isFavorite ?? false),
               imageUrl: data['imageUrl']),
         );
       });
