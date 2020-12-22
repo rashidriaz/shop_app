@@ -34,17 +34,21 @@ class Products with ChangeNotifier {
         return;
       }
       final favoriteResponse = await http.get(favoriteStatusUrl);
-      final favoriteItemsData = json.decode(favoriteResponse.body);
-      final isFavorite = favoriteItemsData == null ? false : null;
+      final favoriteItemsData = json.decode(favoriteResponse.body) as Map<String, dynamic>;
       fetchedData.forEach((id, data) {
-        
+        bool isFavorite = false;
+        if (favoriteItemsData != null) {
+          if (favoriteItemsData.containsKey(id)) {
+            isFavorite = favoriteItemsData[id]['isFavorite'];
+          }
+        }
         loadedItems.add(
           Product(
               id: id,
               title: data['title'],
               description: data['description'],
               price: data['price'],
-              isFavorite: isFavorite == null ? false : (favoriteItemsData[id]?.isFavorite ?? false),
+              isFavorite: isFavorite,
               imageUrl: data['imageUrl']),
         );
       });
